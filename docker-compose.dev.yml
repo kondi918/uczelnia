@@ -1,0 +1,67 @@
+version: "3.9"
+services:
+  backend:
+    build:
+      context: ./backend/backend
+    container_name: backend-dev
+    ports:
+      - "${BACKEND_PORT}:5000"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - Mongo__ConnectionString=mongodb://mongo:27017
+      - Mongo__Database=mydatabase
+    depends_on:
+      - mongo
+    networks:
+      - backend-network
+
+  frontend:
+    build:
+      context: ./frontend
+    container_name: frontend-dev
+    ports:
+      - "${FRONTEND_PORT}:80"
+    volumes:
+      - ./frontend/src:/app/src
+    depends_on:
+      - backend
+    networks:
+      - backend-network
+
+  mongo:
+    image: mongo:7.0
+    container_name: mongo
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+      MONGO_INITDB_DATABASE: ${MONGO_INITDB_DATABASE}
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+    networks:
+      - backend-network
+
+  tests:
+    build:
+      context: ./backend
+      dockerfile: BackendTests/Dockerfile
+    depends_on:
+      - backend
+      - mongo
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - Mongo__ConnectionString=mongodb://mongo:27017
+      - Mongo__Database=mydatabase
+      - BACKEND_URL=http://backend:5000
+    networks:
+      - backend-network
+    command: ["dotnet", "test", "/app/BackendTests/BackendTests.csproj", "--logger:trx"]
+
+
+volumes:
+  mongo-data:
+
+networks:
+  backend-network:
+    driver: bridge
