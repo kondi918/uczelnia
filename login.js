@@ -1,2 +1,1 @@
-console.log('Login module');
-function validateLogin() { return true; }
+function validateLogin() { return true; /* fixed */ }
