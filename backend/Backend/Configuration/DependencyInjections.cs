@@ -1,4 +1,5 @@
 ﻿using Backend.Configuration.MongoDB;
+using Backend.Services;
 
 namespace Backend.Configuration
 {
@@ -10,8 +11,8 @@ namespace Backend.Configuration
 			var mongoOptions = new MongoOptions();
 			config.GetSection("Mongo").Bind(mongoOptions);
 			services.AddSingleton(mongoOptions);
-
 			services.AddSingleton<DbChecker>();
+			services.AddScoped<ICalculations, Calculations>();
 
 			return services;
 		}

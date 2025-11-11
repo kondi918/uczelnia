@@ -6,8 +6,16 @@ public class Program
 	{
 		var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-		builder.WebHost.UseUrls("http://0.0.0.0:5000");
+		builder.Services.AddCors(options =>
+		{
+			options.AddPolicy("AllowAngular", policy =>
+				policy.WithOrigins("http://localhost:4200") // adres Twojego frontendu
+					.AllowAnyHeader()
+					.AllowAnyMethod());
+		});
+
+		// Add services to the container.
+		//builder.WebHost.UseUrls("http://0.0.0.0:5000");
 
 		builder.Services.AddControllers();
 		builder.Services.AddEndpointsApiExplorer();
@@ -17,7 +25,8 @@ public class Program
 
 		var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+		// Configure the HTTP request pipeline.
+		app.UseCors("AllowAngular");
 		if (app.Environment.IsDevelopment())
 		{
 			app.UseSwagger();

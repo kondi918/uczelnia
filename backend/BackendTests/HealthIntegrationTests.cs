@@ -6,6 +6,7 @@ namespace BackendTests
 
 		public HealthIntegrationTests()
 		{
+			//Tutaj przypierdzielilem url z enva, a jak chce lokalnie puscic to localhost pojdzie. Enva z docker compose uzupelniam zeby smigalo
 			_backendUrl = Environment.GetEnvironmentVariable("BACKEND_URL") ?? "http://localhost:5000";
 			Console.WriteLine($"Backend URL: {_backendUrl}");
 		}
@@ -17,7 +18,7 @@ namespace BackendTests
 			var response = await client.GetAsync($"{_backendUrl}/health/GetStatus");
 			var content = await response.Content.ReadAsStringAsync();
 
-			Console.WriteLine(content); // wypisze odpowiedü backendu w logach
+			Console.WriteLine(content);
 			Assert.Equal("OK", response.StatusCode.ToString());
 		}
 	}
