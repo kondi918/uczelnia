@@ -33,27 +33,3 @@ jobs:
         run: |
           docker build -t ${{ secrets.AZURE_ACR_LOGIN_SERVER }}/uczelnia-backend:latest -f backend/Backend/Dockerfile ./backend/Backend
           docker push ${{ secrets.AZURE_ACR_LOGIN_SERVER }}/uczelnia-backend:latest
-
-      # ----------------------------------------------
-      # 2. DEPLOY FRONTEND (na kalkulatorfront)
-      # ----------------------------------------------
-      - name: Deploy frontend image to kalkulatorfront
-        uses: azure/container-apps-deploy-action@v1
-        with:
-          containerAppName: kalkulatorfront
-          resourceGroup: ${{ secrets.AZURE_RESOURCE_GROUP }}
-          imageToDeploy: ${{ secrets.AZURE_ACR_LOGIN_SERVER }}/uczelnia-frontend:latest
-          acrUsername: ${{ secrets.AZURE_ACR_USERNAME }}
-          acrPassword: ${{ secrets.AZURE_ACR_PASSWORD }}
-
-     # ----------------------------------------------
-      # 3. DEPLOY BACKEND (na kalkulatorback)
-      # ----------------------------------------------
-      - name: Deploy backend image to kalkulatorback
-        uses: azure/container-apps-deploy-action@v1
-        with:
-          containerAppName: kalkulator
-          resourceGroup: ${{ secrets.AZURE_RESOURCE_GROUP }}
-          imageToDeploy: ${{ secrets.AZURE_ACR_LOGIN_SERVER }}/uczelnia-backend:latest
-          acrUsername: ${{ secrets.AZURE_ACR_USERNAME }}
-          acrPassword: ${{ secrets.AZURE_ACR_PASSWORD }}
