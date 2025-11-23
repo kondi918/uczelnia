@@ -40,22 +40,20 @@ jobs:
       - name: Deploy frontend image to kalkulatorfront
         uses: azure/container-apps-deploy-action@v1
         with:
-          app-name: kalkulatorfront # Nazwa pierwszej aplikacji
-          resource-group: ${{ secrets.AZURE_RESOURCE_GROUP }}
-          image: ${{ secrets.AZURE_ACR_LOGIN_SERVER }}/uczelnia-frontend:latest
-          # Użycie poświadczeń ACR do autoryzacji wdrożenia
-          acr-username: ${{ secrets.AZURE_ACR_USERNAME }}
-          acr-password: ${{ secrets.AZURE_ACR_PASSWORD }}
+          containerAppName: kalkulatorfront
+          resourceGroup: ${{ secrets.AZURE_RESOURCE_GROUP }}
+          imageToDeploy: ${{ secrets.AZURE_ACR_LOGIN_SERVER }}/uczelnia-frontend:latest
+          acrUsername: ${{ secrets.AZURE_ACR_USERNAME }}
+          acrPassword: ${{ secrets.AZURE_ACR_PASSWORD }}
 
-      # ----------------------------------------------
+     # ----------------------------------------------
       # 3. DEPLOY BACKEND (na kalkulatorback)
       # ----------------------------------------------
       - name: Deploy backend image to kalkulatorback
         uses: azure/container-apps-deploy-action@v1
         with:
-          app-name: kalkulatorback # Nazwa drugiej aplikacji
-          resource-group: ${{ secrets.AZURE_RESOURCE_GROUP }}
-          image: ${{ secrets.AZURE_ACR_LOGIN_SERVER }}/uczelnia-backend:latest
-          # Użycie poświadczeń ACR do autoryzacji wdrożenia
-          acr-username: ${{ secrets.AZURE_ACR_USERNAME }}
-          acr-password: ${{ secrets.AZURE_ACR_PASSWORD }}
+          containerAppName: kalkulator
+          resourceGroup: ${{ secrets.AZURE_RESOURCE_GROUP }}
+          imageToDeploy: ${{ secrets.AZURE_ACR_LOGIN_SERVER }}/uczelnia-backend:latest
+          acrUsername: ${{ secrets.AZURE_ACR_USERNAME }}
+          acrPassword: ${{ secrets.AZURE_ACR_PASSWORD }}
