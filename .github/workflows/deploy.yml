@@ -1,4 +1,4 @@
-name: Build and Push Docker Images and Deploy to Azure Container Apps
+name: Build and Push Docker Images
 
 on:
   push:
@@ -6,14 +6,14 @@ on:
       - main
 
 jobs:
-  build-and-deploy: # Zmieniona nazwa zadania na bardziej opisową
+  build-and-push:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
 
       # ----------------------------------------------
-      # 1. LOGOWANIE, BUDOWANIE I PUSHOWANIE OBRAZÓW (DO ACR)
+      # 1. LOGOWANIE DO ACR
       # ----------------------------------------------
       - name: Login to Azure Container Registry (ACR)
         uses: docker/login-action@v2
@@ -22,14 +22,36 @@ jobs:
           username: ${{ secrets.AZURE_ACR_USERNAME }}
           password: ${{ secrets.AZURE_ACR_PASSWORD }}
 
-      # Build i Push Frontend
+      # ----------------------------------------------
+      # 2. PRZYGOTOWANIE FRONTEND (Minifikacja/Transpilacja)
+      # ----------------------------------------------
+      - name: Setup Node.js and Run Frontend Build (Minify/Transpile)
+        # Używamy akcji do konfiguracji Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '22' # Użyj odpowiedniej wersji dla Twojego projektu
+      
+      - name: Install dependencies and Build Frontend
+        working-directory: ./frontend # Przejście do katalogu frontend
+        run: |
+          npm install
+          # Ta komenda powinna wywoływać minifikację, transpilację (np. Webpack, Rollup)
+          npm run build 
+
+      # ----------------------------------------------
+      # 3. BUDOWANIE I PUSHOWANIE FRONTEND
+      # ----------------------------------------------
       - name: Build and Push frontend image
         run: |
+          # Budujemy obraz, używając przygotowanych plików w katalogu frontend
           docker build -t ${{ secrets.AZURE_ACR_LOGIN_SERVER }}/uczelnia-frontend:latest -f frontend/Dockerfile ./frontend
           docker push ${{ secrets.AZURE_ACR_LOGIN_SERVER }}/uczelnia-frontend:latest
 
-      # Build i Push Backend
+      # ----------------------------------------------
+      # 4. BUDOWANIE I PUSHOWANIE BACKEND
+      # ----------------------------------------------
       - name: Build and Push backend image
         run: |
+          # Dla backendu zakładamy, że pliki źródłowe są gotowe do skopiowania
           docker build -t ${{ secrets.AZURE_ACR_LOGIN_SERVER }}/uczelnia-backend:latest -f backend/Backend/Dockerfile ./backend/Backend
           docker push ${{ secrets.AZURE_ACR_LOGIN_SERVER }}/uczelnia-backend:latest
