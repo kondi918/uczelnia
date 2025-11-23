@@ -79,11 +79,13 @@ export class CalculatorComponentComponent {
         this.isResultShown = true;
       },
       error: (err) => {
-        console.error('Calculation error:', err);
+        console.log(err);
         this.showErrorModal = true;
-        this.errorModalMessage = 'Błąd połączenia z backendem!';
+        this.errorModalMessage = `API Error! ${err?.error?.error ?? err?.message ?? ''}`;
       }
     });
+    this.currentOperation = null;
+    this.secondOperand = null;
 }
 
 closeErrorModal() {

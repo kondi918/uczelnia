@@ -21,11 +21,11 @@ namespace Backend.Controllers
 			{
 				double result = operation switch
 				{
-					"add" => _service.Add(a, b),
-					"subtract" => _service.Subtract(a, b),
-					"multiply" => _service.Multiply(a, b),
-					"divide" => _service.Divide(a, b),
-					"percentage" => _service.Percentage(a, b),
+					"+" => _service.Add(a, b),
+					"-" => _service.Subtract(a, b),
+					"*" => _service.Multiply(a, b),
+					"/" => _service.Divide(a, b),
+					"%" => _service.Percentage(a, b),
 					_ => throw new Exception("Unknown operation")
 				};
 				return Ok(new { result });

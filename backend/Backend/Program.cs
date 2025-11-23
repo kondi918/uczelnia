@@ -9,7 +9,7 @@ public class Program
 		builder.Services.AddCors(options =>
 		{
 			options.AddPolicy("AllowAngular", policy =>
-				policy.WithOrigins("http://localhost:4200") // adres Twojego frontendu
+				policy.WithOrigins("http://localhost:4200", "https://kalkulatorfront.bravesea-6884d3a9.westus2.azurecontainerapps.io") // adres Twojego frontendu
 					.AllowAnyHeader()
 					.AllowAnyMethod());
 		});
