@@ -1,0 +1,74 @@
+name: $(date:yyyyMMdd)$(rev:.r) - Build and Push Docker Images
+
+trigger:
+  branches:
+    include:
+      - main
+
+variables:
+  ACR_SERVICE_CONNECTION: 'TUTAJ WPISALBYM WARTOSC Z SERVICE CONNECTION JAKBYM TO NA AZURE UTWORZYL :)' 
+  
+  FRONTEND_IMAGE_NAME: 'uczelnia-frontend'
+  BACKEND_IMAGE_NAME: 'uczelnia-backend'
+  IMAGE_TAG: 'latest'
+
+jobs:
+- job: build_and_push
+  displayName: 'Build, Transpile and Push Images'
+  pool:
+    vmImage: 'ubuntu-latest'
+  steps:
+  
+  - checkout: self
+    displayName: 'Checkout repository'
+
+  # ----------------------------------------------
+  # 1. ACR
+  # ----------------------------------------------
+  - task: Docker@2
+    displayName: 'Login to Azure Container Registry (ACR)'
+    inputs:
+      command: login
+      containerRegistry: $(ACR_SERVICE_CONNECTION)
+
+  # ----------------------------------------------
+  # 2. FRONTEND (Minifikacja/Transpilacja)
+  # ----------------------------------------------
+  - task: NodeTool@0
+    displayName: 'Setup Node.js 22'
+    inputs:
+      versionSpec: '22.x'
+  
+  - script: |
+      npm install
+      npm run build # Wykonuje ng build -c production
+    displayName: 'Install dependencies and Build Frontend'
+    workingDirectory: 'frontend'
+    
+  # ----------------------------------------------
+  # 3. FRONTEND BUILD AND PUSH
+  # ----------------------------------------------
+  - task: Docker@2
+    displayName: 'Build and Push frontend image'
+    inputs:
+      command: 'buildAndPush'
+      repository: '$(FRONTEND_IMAGE_NAME)'
+      containerRegistry: '$(ACR_SERVICE_CONNECTION)'
+      tags: |
+        $(IMAGE_TAG)
+      Dockerfile: 'frontend/Dockerfile'
+      buildContext: 'frontend'
+
+  # ----------------------------------------------
+  # 4. BACKEND BUILD AND PUSH
+  # ----------------------------------------------
+  - task: Docker@2
+    displayName: 'Build and Push backend image'
+    inputs:
+      command: 'buildAndPush'
+      repository: '$(BACKEND_IMAGE_NAME)'
+      containerRegistry: '$(ACR_SERVICE_CONNECTION)'
+      tags: |
+        $(IMAGE_TAG)
+      Dockerfile: 'backend/Backend/Dockerfile'
+      buildContext: 'backend/Backend'
