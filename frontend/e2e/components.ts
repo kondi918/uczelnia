@@ -13,7 +13,7 @@ export class Components
         this.page = page;
         this.resultDisplay = this.page.getByTestId('result-display');
         this.expressionDisplay = this.page.getByTestId('expression-display');
-        this.calculateButton = this.page.getByTestId('calculate-button');
+        this.calculateButton = this.page.getByTestId('button-calculate');
         this.errorModal = this.page.getByTestId('error-modal');
     }
 

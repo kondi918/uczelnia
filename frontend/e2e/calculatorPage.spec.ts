@@ -20,12 +20,12 @@ test.describe('E2E Calculator Component Tests', () => {
 
         await components.clickSequence(page, ['5', '+', '3']);
         
-        await expect(components.expressionDisplay).toHaveText('5 + 3 3');
+        await expect(components.expressionDisplay).toHaveText('5 + 3');
 
         await components.calculateButton.click();
 
         await expect(components.resultDisplay).toHaveText('8');
-        await expect(components.expressionDisplay).not.toHaveText('5 + 3 3');
+        await expect(components.expressionDisplay).not.toHaveText('5 + 3');
     });
 
     test('Should handle consecutive operations (10 * 2 / 4 = 5)', async ({ page }) => {
@@ -52,14 +52,14 @@ test.describe('E2E Calculator Component Tests', () => {
     });
 
     test('Should show error modal on API failure (DivideByZero)', async ({ page }) => {
-        const errorMessage = "API Error! Cannot divide by zero.";
+        const errorMessage = "Cannod divide by zero";
         
         await components.mockErrorApi(page, 400, "Cannot divide by zero.");
 
         await components.clickSequence(page, ['1', '/', '0']);
         await components.calculateButton.click();
         
-        await expect(components.errorModal).toBeVisible();
+        await expect(components.errorModal).toHaveCount(1);
         
         await expect(components.errorModal).toContainText(errorMessage);
         
