@@ -1,4 +1,4 @@
-name: Build and Push Docker Images
+name: Build, Test and Push Docker Images
 
 on:
   push:
@@ -6,15 +6,91 @@ on:
       - main
 
 jobs:
-  build-and-push:
+  # =====================================================
+  # 1) PLAYWRIGHT E2E TESTS
+  # =====================================================
+  frontend-playwright-tests:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      # ----------------------------------------------
-      # 1. ACR Login
-      # ----------------------------------------------
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "22"
+
+      - name: Install frontend dependencies
+        working-directory: ./frontend
+        run: npm install
+
+      - name: Install Playwright browsers
+        working-directory: ./frontend
+        run: npx playwright install --with-deps
+
+      - name: Run Playwright tests
+        working-directory: ./frontend
+        run: npm run test:e2e
+
+  # =====================================================
+  # 2) ANGULAR UNIT TESTS (KARMA)
+  # =====================================================
+  frontend-unit-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "22"
+
+      - name: Install frontend dependencies
+        working-directory: ./frontend
+        run: npm install
+
+      - name: Run Angular unit tests
+        working-directory: ./frontend
+        run: npm test -- --watch=false --browsers=ChromeHeadless
+
+  # =====================================================
+  # 3) BACKEND TESTS (.NET xUnit/NUnit/MSTest)
+  # =====================================================
+  backend-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: "8.0.x"
+
+      - name: Restore dependencies
+        working-directory: ./backend
+        run: dotnet restore
+
+      - name: Run backend tests
+        working-directory: ./backend
+        run: dotnet test ./BackendTests/BackendTests.csproj --no-build --verbosity normal
+
+  # =====================================================
+  # 4) BUILD AND PUSH BACKEND + FRONTEND (depends on tests)
+  # =====================================================
+  build-and-push:
+    runs-on: ubuntu-latest
+    needs:
+      - frontend-playwright-tests
+      - frontend-unit-tests
+      - backend-tests
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # 1. Login to Azure ACR
       - name: Login to Azure Container Registry (ACR)
         uses: docker/login-action@v2
         with:
@@ -22,31 +98,25 @@ jobs:
           username: ${{ secrets.AZURE_ACR_USERNAME }}
           password: ${{ secrets.AZURE_ACR_PASSWORD }}
 
-      # ----------------------------------------------
-      # 2. Frontend (Minifikacja/Transpilacja)
-      # ----------------------------------------------
-      - name: Setup Node.js and Run Frontend Build (Minify/Transpile)
+      # 2. Build frontend
+      - name: Setup Node.js and Build Frontend
         uses: actions/setup-node@v3
         with:
-          node-version: '22'
-      
-      - name: Install dependencies and Build Frontend
+          node-version: "22"
+
+      - name: Install and Build Frontend
         working-directory: ./frontend
         run: |
           npm install
-          npm run build 
+          npm run build
 
-      # ----------------------------------------------
-      # 3. Frontend build and push
-      # ----------------------------------------------
+      # 3. Build + push frontend image
       - name: Build and Push frontend image
         run: |
           docker build -t ${{ secrets.AZURE_ACR_LOGIN_SERVER }}/uczelnia-frontend:latest -f frontend/Dockerfile ./frontend
           docker push ${{ secrets.AZURE_ACR_LOGIN_SERVER }}/uczelnia-frontend:latest
 
-      # ----------------------------------------------
-      # 4. Backend build and push
-      # ----------------------------------------------
+      # 4. Build + push backend image
       - name: Build and Push backend image
         run: |
           docker build -t ${{ secrets.AZURE_ACR_LOGIN_SERVER }}/uczelnia-backend:latest -f backend/Backend/Dockerfile ./backend/Backend

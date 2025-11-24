@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
 import { MainPageComponent } from './main-page.component';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 
 describe('MainPageComponent', () => {
   let component: MainPageComponent;
@@ -8,9 +8,11 @@ describe('MainPageComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [MainPageComponent]
-    })
-    .compileComponents();
+      imports: [
+        MainPageComponent,        // standalone component
+        HttpClientTestingModule   // <-- KLUCZOWE
+      ]
+    }).compileComponents();
 
     fixture = TestBed.createComponent(MainPageComponent);
     component = fixture.componentInstance;

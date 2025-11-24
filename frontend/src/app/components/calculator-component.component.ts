@@ -14,7 +14,7 @@ export class CalculatorComponentComponent {
   displayValue: string = ''; // aktualnie wyświetlany tekst
   firstOperand: number | null = null;
   secondOperand: number | null = null;
-  currentOperation: string | null = null;
+  currentOperation: string | null = '';
   isResultShown: boolean = false;
   errorMessage: string | null = null;
   showErrorModal: boolean = false;
@@ -84,7 +84,7 @@ export class CalculatorComponentComponent {
         this.errorModalMessage = `API Error! ${err?.error?.error ?? err?.message ?? ''}`;
       }
     });
-    this.currentOperation = null;
+    this.currentOperation = '';
     this.secondOperand = null;
 }
 
@@ -96,7 +96,7 @@ closeErrorModal() {
     this.displayValue = '';
     this.firstOperand = null;
     this.secondOperand = null;
-    this.currentOperation = null;
+    this.currentOperation = '';
     this.isResultShown = false;
     this.errorMessage = null;
   }
