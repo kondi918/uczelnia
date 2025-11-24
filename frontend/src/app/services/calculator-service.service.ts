@@ -17,9 +17,6 @@ export class CalculatorServiceService {
       .set('b', b)
       .set('operation', operacja);
 
-    console.log(this.baseUrl);
-    console.log(`${this.baseUrl}/CalculatorController/Calculate?a=${a}&b=${b}&operation=${operacja}`);
-
     return this.http.get<{ result: number }>(`${this.baseUrl}/Calculator/Calculate`, { params });
   }
 }
