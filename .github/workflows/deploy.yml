@@ -77,7 +77,7 @@ jobs:
 
       - name: Run backend tests
         working-directory: ./backend
-        run: dotnet test ./BackendTests/BackendTests.csproj --no-build --verbosity normal
+        run: dotnet test ./BackendTests/BackendTests.csproj --verbosity normal
 
   # =====================================================
   # 4) BUILD AND PUSH
