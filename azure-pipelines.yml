@@ -22,18 +22,12 @@ jobs:
   - checkout: self
     displayName: 'Checkout repository'
 
-  # ----------------------------------------------
-  # 1. ACR
-  # ----------------------------------------------
   - task: Docker@2
     displayName: 'Login to Azure Container Registry (ACR)'
     inputs:
       command: login
       containerRegistry: $(ACR_SERVICE_CONNECTION)
 
-  # ----------------------------------------------
-  # 2. FRONTEND (Minifikacja/Transpilacja)
-  # ----------------------------------------------
   - task: NodeTool@0
     displayName: 'Setup Node.js 22'
     inputs:
@@ -45,9 +39,6 @@ jobs:
     displayName: 'Install dependencies and Build Frontend'
     workingDirectory: 'frontend'
     
-  # ----------------------------------------------
-  # 3. FRONTEND BUILD AND PUSH
-  # ----------------------------------------------
   - task: Docker@2
     displayName: 'Build and Push frontend image'
     inputs:
@@ -59,9 +50,6 @@ jobs:
       Dockerfile: 'frontend/Dockerfile'
       buildContext: 'frontend'
 
-  # ----------------------------------------------
-  # 4. BACKEND BUILD AND PUSH
-  # ----------------------------------------------
   - task: Docker@2
     displayName: 'Build and Push backend image'
     inputs:
