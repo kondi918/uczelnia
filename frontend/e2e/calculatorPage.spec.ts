@@ -63,7 +63,7 @@ test.describe('E2E Calculator Component Tests', () => {
         
         await expect(components.errorModal).toContainText(errorMessage);
         
-        await components.errorModal.locator('button').click(); // Kliknięcie np. przycisku zamykającego w modalu
+        await components.errorModal.locator('button').click();
         await expect(components.errorModal).not.toBeVisible();
     });
     

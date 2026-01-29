@@ -38,7 +38,6 @@ export class Components
             await route.fulfill({
                 status: status,
                 contentType: 'application/json',
-                // Oczekujemy, że komponent odczyta pole 'error' lub użyje całego message
                 body: JSON.stringify({ error: errorMessage, message: errorMessage }),
             });
         });
